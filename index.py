@@ -2,10 +2,14 @@ import base64
 import requests
 from dotenv import load_dotenv
 import os
+import json
 
 load_dotenv('.env')
 CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+# CLIENT_ID = "60b52514dac246419853e3abe3d297b4"
+# CLIENTSECRET = "23672329e1944d949130ce4e6339c8aa"
+
 
 def access_token():
     try:
@@ -30,15 +34,23 @@ def get_new_release():
         if response.status_code == 200:
             data = response.json()
             albums = data['albums']['items']
-            release = []
-            for i in albums:
-                a = {
-                    'album_name': i['name'],
-                    'release_date': i['release_date']
+            # release = []
+            for album in albums:
+                info = {
+                    'album_name': album['name'],
+                    'release_date': album['release_date'],
+                    'total_tracks': album['total_tracks'],
+                    'album_type': album['album_type'],
+                    'artist_name': album['artists'][0]['name'],
+                    'spotify_url': album['external_urls']['spotify'],
+                    'album_image': album['images'][0]['url'] if album['images'] else None
 
                 }
                 # release.append(a)
-                print(a)
+                with open("output.json","a") as f:
+                    json.dump(info, f, indent=2)
+                    # print(output.json)
+                # release = release.append[a]
         else:
             print("Error:", response.status_code, response.text)
     except Exception as e:
